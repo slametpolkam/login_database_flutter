@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:login_register/constants.dart';
+import 'package:login_register/screens/dasboard_view.dart';
 import 'package:login_register/screens/register_view.dart';
 // import 'package:login_register/screens/dasboard_view.dart';
 import 'package:flutter/services.dart';
@@ -11,6 +12,7 @@ import 'package:http/http.dart' as http;
 import 'package:rflutter_alert/rflutter_alert.dart';
 
 class LoginPage extends StatelessWidget {
+  static const routeName = "/LoginPage";
   @override
   Widget build(BuildContext context) {
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
@@ -76,13 +78,9 @@ Widget _titleDescription() {
 Widget _textField(BuildContext context) {
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
+
   // Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
   var pengguna;
-  void setIntoSharedPreferences() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-
-    await prefs.setString("pengguna", pengguna);
-  }
 
   // Showing CircularProgressIndicator.
 
@@ -92,7 +90,7 @@ Widget _textField(BuildContext context) {
     String password = _passwordController.text.trim();
 
     // SERVER LOGIN API URL
-    var url = 'http://192.168.100.20:81/index.php/pengguna';
+    var url = 'http://192.168.100.31:81/index.php/pengguna';
     // POST KE SISTEM
     var response = await http.post(url,
         // headers: {HttpHeaders.CONTENT_TYPE: "application/json"},
@@ -103,32 +101,17 @@ Widget _textField(BuildContext context) {
 
     // If the Response Message is Matched.
     if (message == 'login berhasil') {
-      Alert(
-        context: context,
-        type: AlertType.warning,
-        title: "SELAMAT DATANG",
-        desc: "di sistem",
-        buttons: [
-          DialogButton(
-            child: Text(
-              "OK",
-              style: TextStyle(color: Colors.white, fontSize: 20),
-            ),
-            onPressed: () => Navigator.pop(context),
-            gradient: LinearGradient(colors: [
-              Color.fromRGBO(116, 116, 191, 1.0),
-              Color.fromRGBO(52, 138, 199, 1.0)
-            ]),
-          )
-        ],
-      ).show();
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => Dashboard()),
+      );
     } else {
       // Showing Alert Dialog with Response JSON Message.
       Alert(
         context: context,
         type: AlertType.warning,
         title: "MAAF NAMA PENGGUNA & SANDI TIDAK TERSEDIA",
-        desc: "Silahkan Kembali",
+        desc: "${message}", //"Silahkan Kembali",
         buttons: [
           DialogButton(
             child: Text(
@@ -144,6 +127,14 @@ Widget _textField(BuildContext context) {
         ],
       ).show();
     }
+  }
+
+  void setIntoSharedPreferences() async {
+    String username = _usernameController.text.trim();
+    pengguna = username;
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    await prefs.setString("pengguna", pengguna);
   }
 
   return Column(

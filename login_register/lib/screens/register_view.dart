@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:login_register/constants.dart';
 import 'package:flutter/services.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:rflutter_alert/rflutter_alert.dart';
 
 class RegisterPage extends StatefulWidget {
   static const routeName = "/RegisterPage";
@@ -20,8 +23,7 @@ class _RegisterPageState extends State<RegisterPage> {
           children: <Widget>[
             _iconRegistrasi(),
             _titleDescription(),
-            _textField(),
-            _buildButton(context),
+            _textField(context),
           ],
         ),
       ),
@@ -51,7 +53,7 @@ Widget _titleDescription() {
         ),
       ),
       Text(
-        "Lorem Impsum dolar sit amrt lorem ipsum ",
+        "Silahkan Mendaftar Kursus di Uda Coding",
         style: TextStyle(
           color: Colors.white,
           fontSize: 12.0,
@@ -62,13 +64,78 @@ Widget _titleDescription() {
   );
 }
 
-Widget _textField() {
+Widget _textField(BuildContext context) {
+  final _usernameController = TextEditingController();
+  final _passwordController = TextEditingController();
+  registrasi() async {
+    // Getting value from Controller
+    String username = _usernameController.text.trim();
+    String password = _passwordController.text.trim();
+
+    // SERVER LOGIN API URL
+    var url = 'http://192.168.100.31:81/index.php/pengguna/daftar';
+    // POST KE SISTEM
+    var response = await http.post(url,
+        // headers: {HttpHeaders.CONTENT_TYPE: "application/json"},
+        body: {'username': username, 'password': password});
+
+    // Getting Server response into variable.
+    var message = jsonDecode(response.body);
+
+    // If the Response Message is Matched.
+    if (message == 'tidak diizinkan') {
+      Alert(
+        context: context,
+        type: AlertType.warning,
+        title: "PENAMBAHAN DATA GAGAL",
+        desc: "Duplikat Nama Pengguna", //"Silahkan Kembali",
+        buttons: [
+          DialogButton(
+            child: Text(
+              "OK",
+              style: TextStyle(color: Colors.white, fontSize: 20),
+            ),
+            onPressed: () => Navigator.pop(context),
+            gradient: LinearGradient(colors: [
+              Color.fromRGBO(116, 116, 191, 1.0),
+              Color.fromRGBO(52, 138, 199, 1.0)
+            ]),
+          )
+        ],
+      ).show();
+    } else {
+      // Showing Alert Dialog with Response JSON Message.
+      Alert(
+        context: context,
+        type: AlertType.warning,
+        title: "PENAMBAHAN DATA BERHASIL",
+        desc: "Silahkan Login", //"Silahkan Kembali",
+        buttons: [
+          DialogButton(
+            child: Text(
+              "OK",
+              style: TextStyle(color: Colors.white, fontSize: 20),
+            ),
+            onPressed: () {
+              Navigator.pushNamed(context, "/");
+            },
+            gradient: LinearGradient(colors: [
+              Color.fromRGBO(116, 116, 191, 1.0),
+              Color.fromRGBO(52, 138, 199, 1.0)
+            ]),
+          )
+        ],
+      ).show();
+    }
+  }
+
   return Column(
     children: <Widget>[
       Padding(
         padding: EdgeInsets.only(top: 12.0),
       ),
       TextFormField(
+        controller: _usernameController,
         decoration: const InputDecoration(
           border: UnderlineInputBorder(),
           enabledBorder: UnderlineInputBorder(
@@ -93,6 +160,7 @@ Widget _textField() {
         padding: EdgeInsets.only(top: 12.0),
       ),
       TextFormField(
+        controller: _passwordController,
         decoration: const InputDecoration(
           border: UnderlineInputBorder(),
           enabledBorder: UnderlineInputBorder(
@@ -114,13 +182,7 @@ Widget _textField() {
         obscureText: true,
         autofocus: false,
       ),
-    ],
-  );
-}
-
-Widget _buildButton(BuildContext context) {
-  return Column(
-    children: <Widget>[
+//  Untuk Tombol
       Padding(
         padding: EdgeInsets.only(top: 16.0),
       ),
@@ -128,13 +190,17 @@ Widget _buildButton(BuildContext context) {
         child: Container(
           padding: EdgeInsets.symmetric(vertical: 8.0),
           width: double.infinity,
-          child: Text(
-            'Registrasi',
-            style: TextStyle(color: ColorPalette.primaryColor),
-            textAlign: TextAlign.center,
+          child: FlatButton(
+            child: Text(
+              'Registrasi',
+              style: TextStyle(color: Colors.white),
+            ),
+            onPressed: () {
+              registrasi();
+            },
           ),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: Colors.blue,
             borderRadius: BorderRadius.circular(30.0),
           ),
         ),
@@ -155,7 +221,7 @@ Widget _buildButton(BuildContext context) {
           style: TextStyle(color: Colors.white),
         ),
         onPressed: () {
-          Navigator.pushNamed(context, "/");
+          Navigator.pushNamed(context, "/LoginPage");
         },
       )
     ],

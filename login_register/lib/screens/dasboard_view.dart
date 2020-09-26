@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:login_register/screens/login_view.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Dashboard extends StatefulWidget {
@@ -15,29 +16,30 @@ class _Dashboard extends State<Dashboard> {
     getFromSharedPreferences();
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
     return MaterialApp(
+        debugShowCheckedModeBanner: false,
         home: Scaffold(
-      appBar: AppBar(
-        title: const Text('Selamat Datang'),
-        actions: <Widget>[
-          // action button
-          IconButton(
-            icon: Icon(
-              Icons.exit_to_app,
-              size: 30.0,
-            ),
-            onPressed: () {
-              Navigator.pushNamed(context, "/");
-            },
+          appBar: AppBar(
+            title: const Text('Selamat Datang'),
+            actions: <Widget>[
+              // action button
+              IconButton(
+                icon: Icon(
+                  Icons.exit_to_app,
+                  size: 30.0,
+                ),
+                onPressed: () {
+                  Navigator.pushNamed(context, LoginPage.routeName);
+                },
+              ),
+            ],
           ),
-        ],
-      ),
-      body: Center(
-          child: Text(
-        "Selamat Datang $pengguna \n Pencet icon sudut kanan atas untuk keluar",
-        style: TextStyle(fontSize: 22.0),
-        textAlign: TextAlign.center,
-      )),
-    ));
+          body: Center(
+              child: Text(
+            "Selamat Datang $pengguna \n Pencet icon sudut kanan atas untuk keluar",
+            style: TextStyle(fontSize: 22.0),
+            textAlign: TextAlign.center,
+          )),
+        ));
   }
 
   getFromSharedPreferences() async {
